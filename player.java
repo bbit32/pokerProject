@@ -45,6 +45,27 @@ public class player {
 	public static void main(String[] args) {
 		
 	}
+	public void resetHand() {
+        hasCards = false;
+        hand.removeAllCards();
+        resetBet();
+    }
+	 public void resetBet() {
+        bet = 0;
+        action = (hasCards() && cash == 0) ? Action.ALL_IN : null;
+    }
+	 public void setBet(int bet) {
+        this.bet = bet;
+    }
+	 public boolean isAllIn() {
+        return hasCards() && (cash == 0);
+    }
+	  public void payCash(int amount) {
+        if (amount > cash) {
+            throw new IllegalStateException("Player asked to pay more cash than he owns!");
+        }
+        cash -= amount;
+    }
 	
 
 }
