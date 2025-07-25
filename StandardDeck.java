@@ -1,55 +1,62 @@
+import acm.program.ConsoleProgram;
 import java.util.ArrayList;
-import java.util.Collections;
 
-public class StandardDeck {
-	private ArrayList<StandardCard> deck = new ArrayList<>();
+public class GameManager extends ConsoleProgram {
 
-	public StandardDeck() {
-		reset();
-		shuffleDeck();
-	}
+    private ArrayList<Player> players;
+    private StandardDeck deck;
 
-	public void reset() {
-		this.deck.clear();
-		String[] suits = {"Hearts", "Diamonds", "Spades", "Clubs"};
-		for (String suit : suits) {
-			for (int i = 2; i <= 14; i++) {
-				deck.add(new StandardCard(i, suit));
-			}
-		}
-	}
+    public void run() {
+        println("=== Poker Game Started ===");
 
-	public void shuffleDeck() {
-		Collections.shuffle(this.deck);  // Uses built-in shuffle
-	}
+        // Step 1: Create Deck
+        deck = new StandardDeck();
 
-	public StandardCard getNextCard() {
-		if (this.deck.isEmpty()) {
-			return null;
-		}
-		return this.deck.remove(this.deck.size() - 1);
-	}
+        // Step 2: Ask how many players
+        int numPlayers = readInt("Enter number of players: ");
+        players = new ArrayList<Player>();
 
-	public int getRemainingCardCount() {
-		return this.deck.size();
-	}
+        // Step 3: Ask for each player's name and balance
+        for (int i = 1; i <= numPlayers; i++) {
+            String name = readLine("Enter name for Player " + i + ": ");
+            int balance = readInt("Enter starting balance for " + name + ": ");
+            players.add(new Player(name, balance, new ArrayList<StandardCard>()));
+        }
 
-	// Optional: display deck without exposing private field
-	public String showDeck() {
-		return this.deck.toString();
-	}
+        // Step 4: Deal pocket cards
+        dealPocketCards();
 
-	public static void main(String[] args) {
-		StandardDeck sd = new StandardDeck();
-		System.out.println("Full shuffled deck:");
-		System.out.println(sd.showDeck());
+        // Step 5: Print status for each player
+        for (Player p : players) {
+            println(p.getStatus());
+        }
 
-		System.out.println("\nDrawing 4 cards:");
-		System.out.println(sd.getNextCard());
-		System.out.println(sd.getNextCard());
-		System.out.println(sd.getNextCard());
-		System.out.println(sd.getNextCard());
+        println("=== Game Ready ===");
+    }
 
-		System.out.println("\nRemaining cards in deck: " + sd.getRemainingCardCount());
-	}
+    private void dealPocketCards() {
+        for (Player p : players) {
+            ArrayList<StandardCard> cards = new ArrayList<StandardCard>();
+            cards.add(deck.getNextCard());
+            cards.add(deck.getNextCard());
+
+            p.resetHand();                     // clear any old cards
+            p.getPocketCards().addAll(cards);  // add new cards
+            for (Player p1 : players) {
+                showCardsWhenReady(p1);
+            }
+        }
+    }
+    public void showCardsWhenReady(Player player) {
+    	readLine("/n" +player.getName() +", press [Enter] when ready to see your cards");
+    	println("Your cards:");
+        for (StandardCard card : player.getPocketCards()) {
+            println(card.toString());
+        }
+        readLine("Press [Enter] to end your turn and hide your cards...");
+        
+        for (int i = 0; i < 100; i++) {
+            println("");
+        }
+    }
 }
