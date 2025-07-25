@@ -9,24 +9,27 @@ public class GameManager extends ConsoleProgram {
     public void run() {
         println("=== Poker Game Started ===");
 
-        // Step 1: Create Deck
         deck = new StandardDeck();
 
-        // Step 2: Ask how many players
         int numPlayers = readInt("Enter number of players: ");
         players = new ArrayList<Player>();
 
-        // Step 3: Ask for each player's name and balance
+       
         for (int i = 1; i <= numPlayers; i++) {
             String name = readLine("Enter name for Player " + i + ": ");
             int balance = readInt("Enter starting balance for " + name + ": ");
-            players.add(new Player(name, balance, new ArrayList<StandardCard>()));
+            players.add(new Player(name, balance));
         }
 
-        // Step 4: Deal pocket cards
+        // Step 4: Deal all cards first
         dealPocketCards();
 
-        // Step 5: Print status for each player
+        // Step 5: Show each player's cards one at a time
+        for (Player p : players) {
+            showCardsWhenReady(p);
+        }
+
+        // Step 6: Print each player's status (without revealing cards)
         for (Player p : players) {
             println(p.getStatus());
         }
@@ -34,29 +37,43 @@ public class GameManager extends ConsoleProgram {
         println("=== Game Ready ===");
     }
 
+
     private void dealPocketCards() {
         for (Player p : players) {
             ArrayList<StandardCard> cards = new ArrayList<StandardCard>();
             cards.add(deck.getNextCard());
             cards.add(deck.getNextCard());
 
-            p.resetHand();                     // clear any old cards
-            p.getPocketCards().addAll(cards);  // add new cards
-            for (Player p1 : players) {
-                showCardsWhenReady(p1);
-            }
+            p.resetHand();
+            p.getPocketCards().addAll(cards);
         }
     }
+    
     public void showCardsWhenReady(Player player) {
-    	readLine("/n" +player.getName() +", press [Enter] when ready to see your cards");
-    	println("Your cards:");
-        for (StandardCard card : player.getPocketCards()) {
-            println(card.toString());
-        }
-        readLine("Press [Enter] to end your turn and hide your cards...");
-        
+        readLine("\n" + player.getName() + ", press [Enter] when you're ready to see your cards...");
         for (int i = 0; i < 100; i++) {
             println("");
         }
+
+        println("Your cards:");
+        for (StandardCard card : player.getPocketCards()) {
+            println(card.toString());
+            
+           
+        }
+        
+        
+        
+
+
+        readLine("Press [Enter] to end your turn and hide your cards...");
+        for (int i = 0; i < 100; i++) {
+            println("");
+        }
+
+
+     // Simulate clearing the screen to hide cards
+        
     }
+
 }
