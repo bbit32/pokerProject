@@ -3,20 +3,20 @@ import java.util.ArrayList;
 public class Player {
     private String name;
     private int balance;
-    private ArrayList<StandardCard> pockCards;
+    private ArrayList<StandardCard> pocketCards;
     private boolean isInGame;
     private boolean hasCards;
     private int bet;
     private boolean action;
     private int cash;
 
-    // ✅ Correct constructor with ArrayList parameter
-    public Player(String name, int balance, ArrayList<StandardCard> pockCards) {
+    public Player(String name, int balance) {
         this.name = name;
         this.balance = balance;
-        this.pockCards = pockCards;
+        this.pocketCards = new ArrayList<StandardCard>();
         this.isInGame = true;
-        this.hasCards = !pockCards.isEmpty();
+        this.hasCards = false;
+        this.hasCards = !pocketCards.isEmpty();
         this.cash = balance;
     }
 
@@ -36,16 +36,16 @@ public class Player {
         balance -= amount;
     }
 
-    public ArrayList<StandardCard> getPockCards() {
-        return pockCards;
+    public ArrayList<StandardCard> getPocketCards() {
+        return pocketCards;
     }
 
     public boolean isInGame() {
         return isInGame;
     }
 
-    public void setIsInGame(boolean isInGame) {
-        this.isInGame = isInGame;
+    public void setIsInGame(boolean inGame) {
+        isInGame = inGame;
     }
 
     public boolean hasCards() {
@@ -53,10 +53,10 @@ public class Player {
     }
 
     public void resetHand() {
-        hasCards = false;
-        pockCards.clear();
-        resetBet();
-    }
+    	 pocketCards.clear();
+    	    hasCards = false;
+    	    resetBet();
+    	}
 
     public void resetBet() {
         bet = 0;
@@ -73,25 +73,19 @@ public class Player {
 
     public void payCash(int amount) {
         if (amount > balance) {
-            throw new IllegalStateException("Player asked to pay more cash than they own!");
+            throw new IllegalStateException("Player asked to pay more than they have!");
         }
         balance -= amount;
     }
 
     public String getStatus() {
-        String cards = (pockCards.size() >= 2)
-            ? pockCards.get(0) + " and " + pockCards.get(1)
-            : "Not enough cards";
-        return "Player " + name + " has a balance of $" + balance +
-               ", pocket cards: " + cards + ", In game: " + isInGame;
-    }
+        String cards;
+        if (pocketCards.size() >= 2) {
+            cards = pocketCards.get(0).toString() + " and " + pocketCards.get(1).toString();
+        } else {
+            cards = "Not enough cards";
+        }
 
-    public static void run(String[] args) {
-        ArrayList<StandardCard> cards = new ArrayList<>();
-        cards.add(new StandardCard(1, "Hearts"));
-        cards.add(new StandardCard(13, "Spades"));
-
-        Player player = new Player("Alice", 1000, cards);
-        System.out.println(player.getStatus());
+        return "Player " + name + " has $" + balance + ", In game: " + isInGame;
     }
 }
