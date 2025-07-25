@@ -1,0 +1,239 @@
+import java.util.*;
+public class HandEvaluator {
+
+	 public static HandRank evaluateHand(ArrayList<StandardCard> cards) {
+	        if (cards.size() != 7) {
+	            throw new IllegalArgumentException("Must provide 7 cards (2 pocket + 5 community)");
+	        }
+
+	        // Sort cards by value
+	        cards.sort((a, b) -> b.getValue() - a.getValue());
+
+	        if (isRoyalFlush(cards)) return HandRank.ROYAL_FLUSH;
+	        if (isStraightFlush(cards)) return HandRank.STRAIGHT_FLUSH;
+	        if (isFourOfAKind(cards)) return HandRank.FOUR_OF_A_KIND;
+	        if (isFullHouse(cards)) return HandRank.FULL_HOUSE;
+	        if (isFlush(cards)) return HandRank.FLUSH;
+	        if (isStraight(cards)) return HandRank.STRAIGHT;
+	        if (isThreeOfAKind(cards)) return HandRank.THREE_OF_A_KIND;
+	        if (isTwoPair(cards)) return HandRank.TWO_PAIR;
+	        if (isPair(cards)) return HandRank.ONE_PAIR;
+
+	        return HandRank.HIGH_CARD;
+	    }
+	 public static boolean isPair(ArrayList<StandardCard> cards) {
+		    Map<Integer, Integer> valueCount = new HashMap<>();
+
+		    // Step 1: Count how many times each card value appears
+		    for (StandardCard card : cards) {
+		        int value = card.getValue(); // like 2 through 14 (Ace)
+		        valueCount.put(value, valueCount.getOrDefault(value, 0) + 1);
+		    }
+
+		    // Step 2: Check if any value appears exactly twice
+		    for (int count : valueCount.values()) {
+		        if (count == 2) return true; // found a pair
+		    }
+
+		    return false; // no pairs found
+		}
+	 public static boolean isThreeOfAKind(ArrayList<StandardCard>cards) {
+		 Map<Integer,Integer> valueCount = new HashMap<>();
+		 for (StandardCard card : cards) {
+		        int value = card.getValue(); // like 2 through 14 (Ace)
+		        valueCount.put(value, valueCount.getOrDefault(value, 0) + 1);
+		    }
+
+		    // Step 2: Check if any value appears exactly twice
+		    for (int count : valueCount.values()) {
+		        if (count == 3) return true; // found a three
+		    }
+		    return false;
+	 }
+	 public static boolean isStraight(ArrayList<StandardCard> cards) {
+		    // Step 1: Extract all unique values
+		    Set<Integer> valueSet = new HashSet<>();
+		    for (StandardCard card : cards) {
+		        valueSet.add(card.getValue());
+
+		        // Step 2: Ace can be low (1) or high (14)
+		        if (card.getValue() == 14) {
+		            valueSet.add(1); // Ace as low
+		        }
+		    }
+
+		    // Step 3: Sort values
+		    List<Integer> sorted = new ArrayList<>(valueSet);
+		    Collections.sort(sorted);
+
+		    // Step 4: Slide window to find 5 in a row
+		    int count = 1;
+		    for (int i = 1; i < sorted.size(); i++) {
+		        if (sorted.get(i) == sorted.get(i - 1) + 1) {
+		            count++;
+		            if (count == 5) {
+		                return true; // Found straight
+		            }
+		        } else if (sorted.get(i) != sorted.get(i - 1)) {
+		            count = 1; // Reset if not duplicate but not consecutive
+		        }
+		    }
+
+		    return false; // No straight found
+		}
+	 public static boolean isFourOfAKind(ArrayList<StandardCard>cards) {
+		 Map<Integer,Integer> valueCount = new HashMap<>();
+		 for (StandardCard card : cards) {
+		        int value = card.getValue(); // like 2 through 14 (Ace)
+		        valueCount.put(value, valueCount.getOrDefault(value, 0) + 1);
+		    }
+
+		    // Step 2: Check if any value appears exactly twice
+		    for (int count : valueCount.values()) {
+		        if (count == 4) return true; // found a three
+		    }
+		    return false;
+
+	 }
+	 public static boolean isTwoPair(ArrayList<StandardCard> cards) {
+		    Map<Integer, Integer> valueCount = new HashMap<>();
+
+		    // Count occurrences of each value
+		    for (StandardCard card : cards) {
+		        int val = card.getValue();
+		        valueCount.put(val, valueCount.getOrDefault(val, 0) + 1);
+		    }
+
+		    int pairCount = 0;
+
+		    for (int count : valueCount.values()) {
+		        if (count >= 2) {
+		            pairCount++;
+		        }
+		    }
+
+		    return pairCount >= 2;  // Two different values with at least 2 cards each
+		}
+	 public static boolean isFullHouse(ArrayList<StandardCard> cards) {
+		    Map<Integer, Integer> valueCount = new HashMap<>();
+
+		    // Count card values
+		    for (StandardCard card : cards) {
+		        int val = card.getValue();
+		        valueCount.put(val, valueCount.getOrDefault(val, 0) + 1);
+		    }
+
+		    boolean hasThree = false;
+		    boolean hasPair = false;
+
+		    for (int count : valueCount.values()) {
+		        if (count >= 3) {
+		            hasThree = true;
+		        } else if (count >= 2) {
+		            hasPair = true;
+		        }
+		    }
+
+		    return hasThree && hasPair;
+		}
+     public static boolean isRoyalFlush(ArrayList<StandardCard> cards) {
+    	 Map<String, ArrayList<Integer>> suitToValues = new HashMap<>();
+
+    	    for (StandardCard card : cards) {
+    	        String suit = card.getSuit();
+    	        int value = card.getValue();
+
+    	        if (!suitToValues.containsKey(suit)) {
+    	            suitToValues.put(suit, new ArrayList<>());
+    	        }
+    	        suitToValues.get(suit).add(value);
+    	    }
+
+    	    // For each suit, check for 10–14
+    	    for (String suit : suitToValues.keySet()) {
+    	        ArrayList<Integer> values = suitToValues.get(suit);
+    	        if (values.contains(10) &&
+    	            values.contains(11) &&
+    	            values.contains(12) &&
+    	            values.contains(13) &&
+    	            values.contains(14)) {
+    	            return true;  // Found Royal Flush
+    	        }
+    	    }
+
+    	    return false;
+    	}
+     public static boolean isFlush(ArrayList<StandardCard> cards) {
+    	    Map<String, ArrayList<StandardCard>> suitMap = new HashMap<>();
+
+    	    // Group cards by suit
+    	    for (StandardCard card : cards) {
+    	        String suit = card.getSuit();
+    	        if (!suitMap.containsKey(suit)) {
+    	            suitMap.put(suit, new ArrayList<>());
+    	        }
+    	        suitMap.get(suit).add(card);
+    	    }
+
+    	    // Check each suit group
+    	    for (ArrayList<StandardCard> suitedCards : suitMap.values()) {
+    	        if (suitedCards.size() >= 5) {
+    	            return true;  // Found a flush!
+    	        }
+    	    }
+
+    	    return false;  // No flush
+    	}
+     public static boolean isStraightFlush(ArrayList<StandardCard> cards) {
+    	    // Step 1: Group cards by suit
+    	    Map<String, ArrayList<Integer>> suitToValues = new HashMap<>();
+
+    	    for (StandardCard card : cards) {
+    	        String suit = card.getSuit();
+    	        int value = card.getValue();
+
+    	        suitToValues.putIfAbsent(suit, new ArrayList<>());
+    	        suitToValues.get(suit).add(value);
+
+    	        // Ace can also be low (1)
+    	        if (value == 14) {
+    	            suitToValues.get(suit).add(1);
+    	        }
+    	    }
+
+    	    // Step 2: Check each suit group for a straight
+    	    for (ArrayList<Integer> values : suitToValues.values()) {
+    	        if (values.size() < 5) continue;
+
+    	        Set<Integer> uniqueValues = new HashSet<>(values);
+    	        List<Integer> sorted = new ArrayList<>(uniqueValues);
+    	        Collections.sort(sorted);
+
+    	        int count = 1;
+    	        for (int i = 1; i < sorted.size(); i++) {
+    	            if (sorted.get(i) == sorted.get(i - 1) + 1) {
+    	                count++;
+    	                if (count == 5) {
+    	                    return true; // Found a straight flush
+    	                }
+    	            } else {
+    	                count = 1;
+    	            }
+    	        }
+    	    }
+
+    	    return false; // No straight flush found
+    	}
+
+
+    	
+
+
+     }
+     
+
+		
+
+	 
+	
+
