@@ -15,7 +15,6 @@ public class Player {
         this.balance = balance;
         this.pocketCards = new ArrayList<StandardCard>();
         this.isInGame = true;
-        this.hasCards = false;
         this.hasCards = !pocketCards.isEmpty();
         this.cash = balance;
     }
@@ -53,10 +52,10 @@ public class Player {
     }
 
     public void resetHand() {
-    	 pocketCards.clear();
-    	    hasCards = false;
-    	    resetBet();
-    	}
+        pocketCards.clear();
+        hasCards = false;
+        resetBet();
+    }
 
     public void resetBet() {
         bet = 0;
